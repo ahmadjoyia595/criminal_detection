@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="grid">
+    <div class="panel">
+      <h3>Quick Controls</h3>
+      <div class="small">Manage criminals, start webcam, or run training</div>
+
+      <div style="margin-top:16px;">
+        <a class="btn" href="{{ url_for('criminal_page') }}">Manage Criminals</a>
+      </div>
+
+      <div style="margin-top:12px;">
+        <a class="btn ghost" href="{{ url_for('emotion_page') }}">Emotion Mode</a>
+      </div>
+
+      <div style="margin-top:20px;">
+        <h3 style="margin-bottom:6px; color:var(--neon-blue)">Status</h3>
+        <div class="small">Model: <span id="modelStatus">Checking…</span></div>
+      </div>
+    </div>
+
+    <div class="main-card">
+      <h2 style="margin-top:6px; color:var(--neon-purple)">Welcome to Smart Security</h2>
+      <p style="color:var(--muted)">This dashboard runs a lightweight LBPH criminal detector and a heuristic emotion detection mode. Use the Criminal tab to upload faces and train the local model.</p>
+
+      <div style="margin-top:18px; display:flex; gap:12px; flex-wrap:wrap;">
+        <a class="btn" href="{{ url_for('criminal_page') }}">Criminal Management</a>
+        <a class="btn" href="{{ url_for('emotion_page') }}">Open Emotion Mode</a>
+        <a class="btn ghost" href="{{ url_for('video_feed_criminal') }}" target="_blank">Open Raw Criminal Feed</a>
+      </div>
+
+      <div style="margin-top:22px;" class="video-wrap">
+        <img src="{{ url_for('video_feed_emotion') }}" class="video-frame" alt="Live preview">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // check model status
+    fetch('/model_status').then(r=>r.json()).then(j=>{
+      const el = document.getElementById('modelStatus');
+      el.innerText = (j.model_file ? "Model ready" : "Model not trained");
+      el.style.color = j.model_file ? '#7ef0ff' : '#ff9aa2';
+    }).catch(e=>{
+      document.getElementById('modelStatus').innerText = "Error";
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="grid">
+    <div class="panel">
+      <h3>Emotion Mode</h3>
+      <div class="small">Lightweight heuristic mode (smile + eyes). Option A mapping: Smile → Normal, No-smile+eyes → Pocket Cutter, Neither → Psycho.</div>
+
+      <div style="margin-top:18px;">
+        <a class="btn" href="{{ url_for('video_feed_emotion') }}" target="_blank">Open Raw Emotion Feed</a>
+      </div>
+    </div>
+
+    <div class="main-card">
+      <h2 style="color:var(--neon-purple)">Emotion Detection (Live)</h2>
+      <p class="small">Stream runs Haar-cascade based heuristics for demo purposes. Not for real-world judgments.</p>
+
+      <div style="margin-top:14px;" class="video-wrap">
+        <img src="{{ url_for('video_feed_emotion') }}" class="video-frame" alt="Emotion stream">
+      </div>
+
+      <div style="margin-top:12px; display:flex; gap:12px;">
+        <a class="btn ghost" href="{{ url_for('criminal_page') }}">Manage Criminals</a>
+        <a class="btn" href="{{ url_for('index') }}">Dashboard</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

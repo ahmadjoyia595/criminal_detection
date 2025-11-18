@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="grid">
+    <div class="panel">
+      <h3>Criminal Management</h3>
+      <div class="small">Upload clear frontal face images for each person. Use training after adding images.</div>
+
+      <div style="margin-top:14px;">
+        <form action="{{ url_for('add_criminal') }}" method="post" enctype="multipart/form-data">
+          <input type="text" name="name" placeholder="Criminal name (unique)" required>
+          <div class="form-row">
+            <input type="file" name="images" accept="image/*" multiple required>
+          </div>
+
+          <div style="margin-top:12px; display:flex; gap:10px;">
+            <button class="btn" type="submit">Upload</button>
+            <button type="button" id="trainBtn" class="btn ghost">Train Model</button>
+          </div>
+        </form>
+      </div>
+
+      <div style="margin-top:18px;">
+        <h3 style="color:var(--neon-blue)">Existing</h3>
+        <div class="list">
+          {% for p in people %}
+            <div class="item">
+              <div>
+                <div style="font-weight:800">{{ p }}</div>
+                <div class="small">folder: criminal_data/{{ p }}</div>
+              </div>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <span class="tag">PROFILE</span>
+                <form method="post" action="{{ url_for('delete_person') }}" style="margin:0;">
+                  <input type="hidden" name="name" value="{{ p }}">
+                  <button class="btn ghost" type="submit" style="padding:8px 10px;">Delete</button>
+                </form>
+              </div>
+            </div>
+          {% else %}
+            <div class="small">No criminal data yet.</div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="main-card">
+      <h2 style="color:var(--neon-purple)">Training & Live Feed</h2>
+      <p class="small">After uploading, press <strong>Train Model</strong>. Then open the live detection feed.</p>
+
+      <div style="margin-top:12px; display:flex; gap:12px; flex-wrap:wrap;">
+        <button id="trainBtnMain" class="btn">Train Now</button>
+        <a class="btn" href="{{ url_for('video_feed_criminal') }}" target="_blank">Open Criminal Feed (raw)</a>
+        <a class="btn ghost" href="{{ url_for('video_feed_emotion') }}" target="_blank">Open Emotion Feed</a>
+      </div>
+
+      <div style="margin-top:18px;">
+        <div class="video-wrap" style="height:420px;">
+          <img src="{{ url_for('video_feed_criminal') }}" class="video-frame" alt="criminal feed">
+        </div>
+      </div>
+
+      <div id="trainResult" style="margin-top:12px; font-weight:700;"></div>
+    </div>
+  </div>
+
+  <script>
+    async function trainModel() {
+      const btn = document.getElementById('trainBtn');
+      const btn2 = document.getElementById('trainBtnMain');
+      btn && (btn.disabled = true);
+      btn2 && (btn2.disabled = true);
+      const resEl = document.getElementById('trainResult');
+      resEl.innerText = "Training… please wait";
+
+      try {
+        const r = await fetch('/train', { method:'POST' });
+        const j = await r.json();
+        if (j.status === 'ok') {
+          resEl.innerText = `Trained ${j.trained_images} images. Labels: ${JSON.stringify(j.labels)}`;
+          resEl.style.color = '#7ef0ff';
+        } else {
+          resEl.innerText = 'Train error: ' + (j.message || JSON.stringify(j));
+          resEl.style.color = '#ff9aa2';
+        }
+      } catch (e) {
+        resEl.innerText = 'Train failed: ' + e;
+        resEl.style.color = '#ff9aa2';
+      } finally {
+        btn && (btn.disabled = false);
+        btn2 && (btn2.disabled = false);
+      }
+    }
+
+    document.getElementById('trainBtn')?.addEventListener('click', trainModel);
+    document.getElementById('trainBtnMain')?.addEventListener('click', trainModel);
+  </script>
+{% endblock %}
