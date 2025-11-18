@@ -2,6 +2,7 @@ install Cv2
     pip install opencv-python
 
 install cv2_contributer
+
     pip install opencv-contrib-python
 
 flask
